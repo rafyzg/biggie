@@ -1,0 +1,133 @@
+url: GET -> /boards
+request: 
+{
+    token: ""
+}
+response:
+{
+    [
+        {
+            type: "folder"
+            value: {
+                id: "",
+                label: "My Special Folder",
+                boards: 
+                [
+                    {
+                        id: "",
+                        label: "Board 1"
+                    },
+                    {
+                        id: "",
+                        label: "Board 2"
+                    }
+                ]
+            }
+        },
+        {
+            type: "board",
+            value: {
+                id: "",
+                label: "My special board!"
+            }
+        }
+    ]
+}
+---------------------
+url: POST -> /boards
+request:
+{
+    token: "",
+    label: ""
+}
+response: 200OK (Success) / Error for error
+---------------------
+url: POST -> /folders
+request:
+{
+    token: "",
+    label: ""
+}
+response: 200OK (Success) / Error for error
+---------------------
+url: POST -> /groups
+request:
+{
+    token: "",
+    label: "",
+    boardId: ""
+}
+response: 200OK (Success) / Error for error
+---------------------
+url: GET -> /boards/:boardId
+request: 
+{
+    token: "",
+    label: "",
+    teamMembers: [
+        {
+            id: "",
+            fullName: ""
+        }
+    ],
+    groups: [
+        {
+            id: "",
+            label: ""
+        }
+    ],
+    tasks: [
+        {
+            id: "",
+            label: "",
+            groupId: "",
+            ownerId: "",
+            status: "",
+            metadata: {
+                // ....
+            }
+        }
+    ]
+}
+----------------------
+url: POST -> /boards/:groupId/task
+request:
+{
+    token: "",
+    label: "",
+    ownerId: "",
+    status: "",
+    metadata: {
+        // ....
+    }
+}
+response: 200OK / Error for error
+------------------------
+URL: GET -> /boards/:boardId/teamMembers
+request:
+{
+    token: "",
+    input: "" // user input (for example "denny")
+}
+response:
+{
+    [
+        {
+            id: "",
+            fullName: ""
+        }
+    ]
+}
+----------------------
+URL: GET -> /teamMembers/:teamMemberId
+request:
+{
+    token: ""
+}
+response:
+{
+    id: "",
+    emailAddress: "",
+    fullName: "",
+    updatedAt: "",
+}
