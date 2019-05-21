@@ -26,7 +26,7 @@ module.exports = function buildTask(sequelize, DataTypes) {
             unique: 'externalIdBoardUnique',
         },
         status: { type: DataTypes.STRING, allowNull: false },
-        metadata: { type: DataTypes.JSONB, allowNull: false },
+        metadata: { type: DataTypes.JSON, allowNull: false },
     });
 
     task.associate = models => {
@@ -46,5 +46,5 @@ module.exports = function buildTask(sequelize, DataTypes) {
         });
     };
 
-    return group;
+    return task;
 };
