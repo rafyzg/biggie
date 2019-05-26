@@ -5,11 +5,11 @@ module.exports = function buildTeamMember(sequelize, DataTypes) {
     });
 
     teamMember.associate = models => {
-        teamMember.tasks = group.belongsTo(models.task, {
+        teamMember.tasks = teamMember.belongsTo(models.task, {
             as: 'task',
-            foreignKey: { name: 'OwnerId', allowNull: false },
+            foreignKey: { name: 'ownerId', allowNull: false },
         });
     };
 
-    return group;
+    return teamMember;
 };
