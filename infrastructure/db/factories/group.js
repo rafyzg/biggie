@@ -6,9 +6,10 @@ const groupFactory = async instances => {
 
   for (let i = 0; i < instances; i++) {
     const name = faker.commerce.productName();
+    const kind = faker.random.arrayElement(["folder", "group"]);
     await models.group.create({
       name,
-      kind: "FOLDER"
+      kind
     });
   }
 };

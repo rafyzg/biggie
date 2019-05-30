@@ -13,7 +13,7 @@ const teamMemberFactory = async instances => {
     });
   }
 };
-teamMemberFactory(1);
+
 module.exports = {
     teamMemberFactory
 };

@@ -6,16 +6,21 @@ const taskFactory = async instances => {
 
   for (let i = 0; i < instances; i++) {
     const label = faker.commerce.productName();
+    const ownerId = faker.random.number(await models.teammember.count());
+    const groupId = faker.random.number(await models.group.count());
+    const boardId = faker.random.number(await models.board.count());
+    const status = faker.random.arrayElement(["done", "waiting"]);
     await models.task.create({
       label,
-      ownerId: 1,
-      groupId: 1,
-      boardId: 1,
-      status: "done",
+      ownerId,
+      groupId,
+      boardId,
+      status,
       metadata: {test: "done"},
     });
   }
 };
+
 module.exports = {
   taskFactory
 };
