@@ -9,8 +9,6 @@ module.exports = function buildBoard(sequelize, DataTypes) {
             },
             unique: 'externalIdSGroupUnique',
         },
-    }, {
-        freezeTableName: true
     });
 
     board.associate = models => {

@@ -1,11 +1,11 @@
 module.exports = function buildTeamMember(sequelize, DataTypes) {
-    const teamMember = sequelize.define('teamMember', {
+    const teamMember = sequelize.define('teammember', {
         emailAddress: { type: DataTypes.STRING, allowNull: false },
         password: { type: DataTypes.STRING, allowNull: false },
     });
 
     teamMember.associate = models => {
-        teamMember.tasks = teamMember.belongsTo(models.task, {
+        teamMember.task = teamMember.hasMany(models.task, {
             as: 'task',
             foreignKey: { name: 'ownerId', allowNull: false },
         });
