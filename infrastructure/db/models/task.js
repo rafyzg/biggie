@@ -17,14 +17,6 @@ module.exports = function buildTask(sequelize, DataTypes) {
             },
             unique: 'externalIdSGroupUnique',
         },
-        boardId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: sequelize.models.board,
-                key: 'id',
-            },
-            unique: 'externalIdBoardUnique',
-        },
         status: { type: DataTypes.STRING, allowNull: false },
         metadata: { type: DataTypes.JSON, allowNull: false },
     });
@@ -33,11 +25,6 @@ module.exports = function buildTask(sequelize, DataTypes) {
         task.owner = task.belongsTo(models.teamMember, {
             as: 'teamMember',
             foreignKey: { name: 'ownerId', allowNull: false },
-        });
-
-        task.board = task.belongsTo(models.board, {
-            as: 'board',
-            foreignKey: { name: 'boardId', allowNull: false },
         });
 
         task.group = task.belongsTo(models.group, {

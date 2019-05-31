@@ -9,21 +9,15 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       label: {
+        allowNull: false,
         type: Sequelize.STRING
       },
-      ownerId: {
-        type: Sequelize.INTEGER
-      },
-      groupId: {
-        type: Sequelize.INTEGER
-      },
-      boardId: {
-        type: Sequelize.INTEGER
-      },
       status: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       metadata: {
+        allowNull: false,
         type: Sequelize.JSONB
       },
       createdAt: {
