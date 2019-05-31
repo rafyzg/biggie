@@ -6,10 +6,10 @@ const boardFactory = async instances => {
 
   for (let i = 0; i < instances; i++) {
     const label = faker.commerce.productName();
-    //const groups = await models.group.findAll();
-    await models.board.create({
+    const groupId = faker.random.number(await models.board.count());
+      await models.board.create({
       label,
-      groupId: 1,
+      groupId
     });
   }
 };
