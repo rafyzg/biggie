@@ -20,13 +20,13 @@
 	- id
 	- name
 	- kind
+	- boardId
 
 - Tasks
 	- id
 	- label
 	- OwnerId
 	- groupId
-	- boardId
 	- status
 	- metadata
 	- createdAt
