@@ -7,7 +7,7 @@ module.exports = function buildBoard(sequelize, DataTypes) {
                 model: sequelize.models.group,
                 key: 'id',
             },
-            unique: 'externalIdSGroupUnique',
+            unique: 'externalIdGroupUnique',
         },
     });
 
@@ -17,6 +17,11 @@ module.exports = function buildBoard(sequelize, DataTypes) {
         board.folder = board.belongsTo(models.group, {
             as: 'folder',
             foreignKey: { name: 'groupId', allowNull: false },
+        });
+
+        board.groups = board.hasMany(models.group, {
+            as: 'group',
+            foreignKey: { name: 'boardId', allowNull: false},
         });
     };
 

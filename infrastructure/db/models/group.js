@@ -6,12 +6,30 @@ module.exports = function buildGroup(sequelize, DataTypes) {
     const group = sequelize.define('group', {
         name: { type: DataTypes.STRING, allowNull: false },
         kind: { type: DataTypes.STRING, allowNull: false },
+        boardId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: sequelize.models.board,
+                key: 'id',
+            },
+            unique: 'externalIdBoardUnique',
+        },
     });
 
     group.associate = models => {
         group.board = group.belongsTo(models.board, {
             as: 'board',
-            foreignKey: { name: 'groupId', allowNull: false },
+            foreignKey: { name: 'boardId', allowNull: false },
+        });
+
+        group.boardContainer = group.hasMany(models.board, {
+            as: 'board',
+            foreignKey: { name: 'boardId', allowNull: true },
+        });
+
+        group.tasks = group.hasMany(models.task, {
+           as: 'task',
+           foreignKey: { name: 'groupId', allowNull: false },
         });
     };
 
