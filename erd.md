@@ -8,30 +8,35 @@
 
 #### Logical Objects ####
 
+-Folders
+	- id
+	- label
+	-createdAt
+	-updatedAt
+
 - Boards
 	- id
 	- label
-	- groupId
+	- folderId
 	- createdAt
 	- updatedAt
-	- deletedAt
   
 - Groups
 	- id
 	- name
-	- kind
 	- boardId
+	- createdAt
+	- updatedAt
 
 - Tasks
 	- id
 	- label
-	- OwnerId
-	- groupId
 	- status
 	- metadata
+	- teammemberId
+	- groupId
 	- createdAt
 	- updatedAt
-	- deletedAt
 
 - Team Members
 	- id
