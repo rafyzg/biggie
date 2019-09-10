@@ -1,37 +1,45 @@
 const { models, initDb } = require('./')
 
-exports.getFolders = async(request) => {
-
-    await initDb();
+/**
+* Finds all the Folders of specific Team member
+* @param {int} teammemeberId id of the wanted teammember
+* @return {Promise} promise, with json response
+*/
+exports.getFolders = async(teammemeberId) => {
 
     return new Promise((resolve) => {
-        models.teammember.findByPk(request.id).then(user => {
-            user.getFolders().then((folders) => {
-                let resp = { folders : new Array() };
-                for(let i = 0; i < folders.length;i++) {
-                    resp.folders[i] = {
-                        id : folders[i].id,
-                        label : folders[i].label
-                    }
+
+        models.folder.findAll({ where : { teammemeberId : teammemeberId} }).then(folders => {
+
+            let resp = { folders : new Array() };
+            for(let i = 0; i < folders.length;i++) {
+                resp.folders[i] = {
+                    id : folders[i].id,
+                    label : folders[i].label
                 }
-                resolve(resp);
-            });
+            }
+            resolve(resp);
+
         });
+
     });
 }
 
+/**
+* Adds folder to folders table with corresponding given information
+* @param {json} request post body request
+* @return Nothing
+*/
 exports.addFolder = async(request) => {
-    await initDb();
     models.folder.create({ label : request.label, teammemberId : request.id});
 }
 
 /**
-* Findes all the boards of specific Team member
+* Finds all the boards of specific Team member
 * @param {int} teammemeberId id of the wanted teammember
 * @return {Promise} promise, with json response
 */
 exports.getBoards = async (teammemeberId) => {
-    //await initDb();
 
     return new Promise((resolve) =>  {
         models.teammember.findByPk(teammemeberId).then(user => {
@@ -55,7 +63,6 @@ exports.getBoards = async (teammemeberId) => {
 }
 
 exports.addBoard = async(request) => {
-    await initDb();
 
     models.teammember.findByPk(request.id).then(user => {
         models.board.create({ label : request.label, folderId: request.folder}).then(board => {
@@ -65,8 +72,12 @@ exports.addBoard = async(request) => {
     
 }
 
+/**
+* Gets all the information about specific Teammember
+* @param {int} teammemeberId id of the wanted teammember
+* @return {Promise} promise, with json response
+*/
 exports.getTeamMember = async(teammemberId) => {
-    await initDb();
 
     return new Promise((resolve) => {
         models.teammember.findByPk(teammemberId).then(user => {
@@ -90,19 +101,23 @@ exports.getTeamMember = async(teammemberId) => {
 }
 
 exports.addTeamMemeber = async(request) => {
-    await initDb();
-
-    models.teammember.create({ emailAddress : request.emailAddress, password : request.password });
+    models.teammember.create({ emailAddress : request.emailAddress, 
+        password : request.password });
 
 }
 
+/**
+* Finds all the Teammembers of specific board
+* @param {int} boardId id of the wanted board
+* @return {Promise} promise, with json response
+*/
 exports.getBoardTeammembers = async(boardId) => {
     
-    await initDb();
-    
     return new Promise((resolve) => {
+
         models.board.findByPk(boardId).then((board) => {
             board.getTeammembers().then(users => {
+
                 let resp = { Teammembers : new Array() };
                 for(let i = 0;i < users.length;i++) {
                     resp.Teammembers[i] = {
@@ -113,17 +128,24 @@ exports.getBoardTeammembers = async(boardId) => {
                     }
                 }
                 resolve(resp);
+
             });
         });
+
     });
 }
-
-exports.getGroups = async(request) => {
-    await initDb();
+/**
+* Finds all the Groups of specific board
+* @param {int} boardId id of the wanted board
+* @return {Promise} promise, with json response
+*/
+exports.getGroups = async(boardId) => {
 
     return new Promise((resolve) => {
-        models.group.findAll({ where : { boardId : request.boardId } }).then(groups => {
-            let resp = { groups : new Array() };
+
+        models.group.findAll({ where : { boardId : boardId } }).then(groups => {
+
+            let resp = { groups : new Array() }; //Builds array of all the groups
             for(let i = 0;i < groups.length;i++) {
                 resp.groups[i] = {
                     id : groups[i].id,
@@ -132,22 +154,26 @@ exports.getGroups = async(request) => {
                 }
             }
             resolve(resp);
+
         });
     });
 }
 
 exports.addGroup = async(request) => {
 
-    await initDb();
     models.group.create({ label : request.label, boardId : request.boardId });
 
 }
-
-exports.getGroupTasks = async(request) => {
-    //await initDb();
+/**
+* Finds all the Tasks of specific group
+* @param {int} groupId id of the wanted group
+* @return {Promise} promise, with json response
+*/
+exports.getGroupTasks = async(groupId) => {
 
     return new Promise((resolve) => {
-        models.group.findByPk(request.groupId).then((group) => {
+
+        models.group.findByPk(groupId).then((group) => {
             group.getTasks().then((tasks) => {
 
                 let resp = { tasks : new Array() }
@@ -166,15 +192,18 @@ exports.getGroupTasks = async(request) => {
         });
     });
 }
-
+/**
+* Finds all information(groups and tasks and related teammembers) of specific board
+* @param {int} request information of the request
+* @return {Promise} promise, with json response
+*/
 exports.getBoard = async(request) => {
-    await initDb();
 
     var response = {};
     getBoardTeammembers(request.boardId).then((board) => {
         response.teammembers = board.Teammembers;
 
-        getGroups(request).then((groups) => {
+        getGroups(request.boardId).then((groups) => {
 
             response.groups = groups.groups;
             response.tasks = new Array();
@@ -184,8 +213,8 @@ exports.getBoard = async(request) => {
                     tasks : new Array()
                 }
                 //response.tasks[i] = new Array();
-                request.groupId = groups.groups[i].id;
-                getGroupTasks(request).then((tasks) => {
+                let groupId = groups.groups[i].id;
+                getGroupTasks(groupId).then((tasks) => {
 
                     console.log(tasks.tasks);
                     response.tasks[i].tasks = tasks.tasks.slice();
@@ -201,8 +230,9 @@ exports.getBoard = async(request) => {
 
 exports.addTask = async(request) => {
     
-    models.task.create({ label : request.label, status : 'unfinished', metadata : request.metadata,
-            teammemeberId : request.teammemberId, groupId : request.groupId });
+    models.task.create({ label : request.label, status : 'unfinished', 
+        metadata : request.metadata, teammemeberId : request.teammemberId,
+        groupId : request.groupId });
 }
 
 /*const main = async () => {

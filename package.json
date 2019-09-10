@@ -21,6 +21,6 @@
     "faker": "^4.1.0",
     "pg": "^7.11.0",
     "sequelize": "^5.8.6",
-    "sequelize-cli": "^5.4.0"
+    "sequelize-cli": "^5.5.1"
   }
 }
