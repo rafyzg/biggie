@@ -8,15 +8,15 @@ let sequelize;
 
 // Sequelize init function
 const init = databaseUrl => {
-  const opts = {
+  /*const opts = {
         //prevent sequelize from pluralizing table names
         freezeTableName: true
-    };
+    };*/
 
   sequelize = new Sequelize(databaseUrl, {
     dialect: "postgres",
-    logging: false,
-    define: opts
+    logging: false
+    //define: opts
   });
 
   fs.readdirSync(path.join(__dirname, "models"))

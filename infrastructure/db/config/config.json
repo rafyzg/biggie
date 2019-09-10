@@ -1,14 +1,14 @@
 {
   "development": {
-    "username": "admin",
-    "password": null,
+    "username": "postgres",
+    "password": 12345,
     "database": "monday",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
-    "username": "admin",
-    "password": null,
+    "username": "postgres",
+    "password": 12345,
     "database": "monday",
     "host": "127.0.0.1",
     "dialect": "postgres"
