@@ -19,6 +19,7 @@
   "homepage": "https://github.com/rafyzg/biggie#readme",
   "dependencies": {
     "faker": "^4.1.0",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^7.11.0",
     "sequelize": "^5.8.6",
     "sequelize-cli": "^5.5.1"

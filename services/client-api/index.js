@@ -2,9 +2,17 @@ const express = require('express');
 const handler = require('../../infrastructure/db/handler.js');
 const { initDb } = require('../../infrastructure/db/');
 const logger = require('../../infrastructure/logging/logger.js')
+const auth = require('../auth-api/verifyUserMiddleware');
 const app = express()
 const port = 5867;
 initDb();
+app.use(express.json());
+app.post('/login', [auth.verifyLogin,
+    auth.login]);
+
+app.get('/home', [auth.validateToken], (req, res) => {
+    res.status(200).send({auth : true, id : req.userId, emailAddress: req.emailAddress});
+});
 
 app.route('/boards')
     .get((req,res) => {
