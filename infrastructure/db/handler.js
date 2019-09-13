@@ -1,253 +1,208 @@
-const { models, initDb } = require('./')
+const { models, getSequelize } = require('./')
 
 /**
 * Finds all the Folders of specific Team member
-* @param {int} teammemeberId id of the wanted teammember
+* @param {int} teammemberId id of the wanted teammember
 * @return {Promise} promise, with json response
 */
-exports.getFolders = async(teammemeberId) => {
-
-    return new Promise((resolve) => {
-
-        models.folder.findAll({ where : { teammemeberId : teammemeberId} }).then(folders => {
-
-            let resp = { folders : new Array() };
-            for(let i = 0; i < folders.length;i++) {
-                resp.folders[i] = {
-                    id : folders[i].id,
-                    label : folders[i].label
-                }
-            }
-            resolve(resp);
-
-        });
-
-    });
-}
+const getFolders = async(teammemberId) => {
+    try {
+        return await model.folder.findAll({ where : { teammemberId : teammemberId} });
+    } catch(err) {
+        throw Error(err);
+    }
+};
 
 /**
 * Adds folder to folders table with corresponding given information
 * @param {json} request post body request
-* @return Nothing
+* @return Nothing.
 */
-exports.addFolder = async(request) => {
-    models.folder.create({ label : request.label, teammemberId : request.id});
+const addFolder = async(request) => {
+    try {
+        models.folder.create({ label : request.label, teammemberId : request.id});
+    } catch(err) {
+        throw Error(err);
+    }
 }
 
 /**
 * Finds all the boards of specific Team member
-* @param {int} teammemeberId id of the wanted teammember
-* @return {Promise} promise, with json response
+* @param {int} teammemberId id of the wanted teammember
+* @return {JSON} Json object with board detailss
 */
-exports.getBoards = async (teammemeberId) => {
+const getBoards = async(teammemberId) => {
+    try {
+        const teammember = await getTeamMember(teammemberId);
+        return await teammember.getBoards();
+    } catch(err) {
+        throw Error(err);
+    }
+};
 
-    return new Promise((resolve) =>  {
-        models.teammember.findByPk(teammemeberId).then(user => {
-        
-            user.getBoards().then(boards => {
-                let response = {
-                    boards : new Array()
-                }
-                for(let i = 0; i < boards.length;i++) {
-                    response.boards[i] = {
-                        id : boards[i].id,
-                        label : boards[i].label
-                    }
-                }
-
-                resolve(response);
-
-            });
-        });
-    });
-}
-
-exports.addBoard = async(request) => {
-
-    models.teammember.findByPk(request.id).then(user => {
-        models.board.create({ label : request.label, folderId: request.folder}).then(board => {
-            board.setTeammembers(user, {});
-        });
-    });
-    
+/**
+* Creates new Board
+* @param {JSON} board Details of the new Board
+* @return Nothing.
+*/
+const addBoard = async(board) => {
+    try {
+        const board = await models.board.create({ label : request.label, folderId: request.folder});
+        const member = await getTeamMember(board.teammemberId);
+        board.setTeammembers(member, {});
+    } catch(err) {
+        throw Error(err);
+    }
 }
 
 /**
-* Gets all the information about specific Teammember
-* @param {int} teammemeberId id of the wanted teammember
-* @return {Promise} promise, with json response
+* Gets Teammember info by id
+* @param {int} teammemberId id of the wanted teammember
+* @return {JSON} Json object, with Teammember's data
 */
-exports.getTeamMember = async(teammemberId) => {
+const getTeamMember = async(teammemberId) => {
+    try {
+        return await models.teammember.findByPk(teammemberId);
+    } catch(err) {
+        throw Error(err);
+    }
+};
 
-    return new Promise((resolve) => {
-        models.teammember.findByPk(teammemberId).then(user => {
-            let resp;
-            if(user != null) {
-                resp = {
-                    id : user.id,
-                    emailAddress : user.emailAddress,
-                    createdAt : user.createdAt,
-                    updatedAt : user.updatedAt
-                }
-            }
-            else {
-                resp = {
-                    error : "Couldn't find id of " + request.teamMemberId + " in teammembers",
-                }
-            }
-            resolve(resp);
-        });
-    });
+/**
+* Finds Teammember by email
+* @param {string} emailAddress email of the wanted Teammember
+* @return {JSON} json, with Teammember's data
+*/
+const getTeammemberByEmail = async(emailAddress) => {
+    try {
+        return await models.teammember.findOne({ where : { emailAddress : emailAddress}});
+    } catch (err) {
+        throw Error(err);
+    }
 }
-
-exports.addTeamMemeber = async(request) => {
-    models.teammember.create({ emailAddress : request.emailAddress, 
-        password : request.password });
+/**
+* Creates Teammember
+* @param {JSON} member Details of the new members
+* @return Nothing.
+*/
+const createTeamMemeber = async(member) => {
+    models.teammember.create({ emailAddress : member.emailAddress, 
+        password : member.password });
 
 }
 
 /**
 * Finds all the Teammembers of specific board
 * @param {int} boardId id of the wanted board
-* @return {Promise} promise, with json response
+* @return {JSON} json, with board's teammembers details
 */
-exports.getBoardTeammembers = async(boardId) => {
-    
-    return new Promise((resolve) => {
-
-        models.board.findByPk(boardId).then((board) => {
-            board.getTeammembers().then(users => {
-
-                let resp = { Teammembers : new Array() };
-                for(let i = 0;i < users.length;i++) {
-                    resp.Teammembers[i] = {
-                        id : users[i].id,
-                        emailAddress : users[i].emailAddress,
-                        createdAt : users[i].createdAt,
-                        updatedAt : users[i].updatedAt
-                    }
-                }
-                resolve(resp);
-
-            });
-        });
-
-    });
+const getBoardTeammembers = async(boardId) => {
+    try {
+        const board = await getBoard(boardId);
+        if(board != null) {
+            return await board.getTeammembers();
+        } else {
+            return [];
+        }
+    } catch(err) {
+        throw Error(err);
+    }
 }
 /**
 * Finds all the Groups of specific board
 * @param {int} boardId id of the wanted board
-* @return {Promise} promise, with json response
+* @return {JSON} json with all groups of requested board
 */
-exports.getGroups = async(boardId) => {
-
-    return new Promise((resolve) => {
-
-        models.group.findAll({ where : { boardId : boardId } }).then(groups => {
-
-            let resp = { groups : new Array() }; //Builds array of all the groups
-            for(let i = 0;i < groups.length;i++) {
-                resp.groups[i] = {
-                    id : groups[i].id,
-                    label : groups[i].label,
-                    updatedAt : groups[i].updatedAt
-                }
-            }
-            resolve(resp);
-
-        });
-    });
+const getGroups = async(boardId) => {
+    try {
+        return await models.group.findAll({ where : { boardId : boardId } });
+    } catch(err) {
+        throw Error(err);
+    }
 }
 
-exports.addGroup = async(request) => {
+/**
+* Checks if a Teammember is a member of a certain board
+* @param {int} boardId id of the wanted board
+* @param2 {int} teammemberId id of the wanted teammember
+* @return {Boolean} True - if a member of the board, else False
+*/
+const isBoardTeammember = async(boardId, teammemberId) => {
+    const sequelize = await getSequelize();
+    const isMember = await sequelize.query('SELECT * FROM board_teammember WHERE "boardId" = (:boardId) AND "teammemberId" = (:teammemberId)',{
+        replacements : { boardId : boardId, teammemberId : teammemberId},
+        type: sequelize.QueryTypes.SELECT });
+    if(isMember.length == 0) {
+        return false;
+    }
+    return true;
+}
 
-    models.group.create({ label : request.label, boardId : request.boardId });
 
+/**
+* Add group to a specific board
+* @param {JSON} group , json with values of the needed fields
+* @return Nothing
+*/
+const addGroup = async(group) => {
+    try {
+        await models.group.create({ label : group.label, boardId : group.boardId });
+    } catch(err) {
+        throw Error(err);
+    }
 }
 /**
 * Finds all the Tasks of specific group
 * @param {int} groupId id of the wanted group
-* @return {Promise} promise, with json response
+* @return {JSON} Json, that contains all tasks of requested  group
 */
-exports.getGroupTasks = async(groupId) => {
-
-    return new Promise((resolve) => {
-
-        models.group.findByPk(groupId).then((group) => {
-            group.getTasks().then((tasks) => {
-
-                let resp = { tasks : new Array() }
-                for(let i = 0; i < tasks.length; i++) {
-
-                    resp.tasks[i] = {
-                        id : tasks[i].id,
-                        label : tasks[i].label,
-                        status : tasks[i].status,
-                        metadata : tasks[i].metadata
-                    }
-                }
-
-                resolve(resp);
-            });
-        });
-    });
+const getGroupTasks = async(groupId) => {
+    try {
+        return await models.task.findAll({ where : {groupId : groupId}});
+    } catch(err) {
+        throw Error(err);
+    }
 }
 /**
-* Finds all information(groups and tasks and related teammembers) of specific board
-* @param {int} request information of the request
-* @return {Promise} promise, with json response
+* Find board instance by boardId
+* @param {int} boardId id of the wanted board
+* @return {JSON} Json, that contains data of the requested group
 */
-exports.getBoard = async(request) => {
-
-    var response = {};
-    getBoardTeammembers(request.boardId).then((board) => {
-        response.teammembers = board.Teammembers;
-
-        getGroups(request.boardId).then((groups) => {
-
-            response.groups = groups.groups;
-            response.tasks = new Array();
-            for(let i = 0; i < groups.groups.length; i++) {
-                response.tasks[i] = {
-                    groupId : groups.groups[i].id,
-                    tasks : new Array()
-                }
-                //response.tasks[i] = new Array();
-                let groupId = groups.groups[i].id;
-                getGroupTasks(groupId).then((tasks) => {
-
-                    console.log(tasks.tasks);
-                    response.tasks[i].tasks = tasks.tasks.slice();
-                    //response.tasks.tasks = tasks.tasks;
-                    //response.tasks.push(tasks);
-                    console.log(response);
-
-                });
-            }
-        });
-    });
+const getBoard = async(boardId) => {
+    try {
+        return await models.board.findByPk(boardId);
+    } catch(err) {
+        throw Error(err);
+    }
+};
+/**
+* Add task to a specific group, with a teammemberId
+* @param {JSON} task , json with values of the needed fields
+* @return Nothing
+*/
+const addTask = async(task) => {
+    try {
+        models.task.create({ label : task.label, status : 'unfinished', 
+            metadata : task.metadata, teammemberId : task.teammemberId,
+            groupId : task.groupId });
+    } catch (err) {
+        throw Error(err);
+    }
 }
 
-exports.addTask = async(request) => {
-    
-    models.task.create({ label : request.label, status : 'unfinished', 
-        metadata : request.metadata, teammemeberId : request.teammemberId,
-        groupId : request.groupId });
-}
 
-/*const main = async () => {
-    const request = {
-        boardId : 1,
-        groupId : 1
-    };
-
-    await getBoard(request);
-
-    //await addFolder(request);
-    //const resp = await getFolders(request);
-    /*getFolders(request).then(resp => {
-        console.log(resp);
-    });
-}
-
-main();*/
+module.exports = {
+    getFolders,
+    getTeammemberByEmail,
+    getBoards,
+    getBoard,
+    getBoardTeammembers,
+    isBoardTeammember,
+    getGroupTasks,
+    getGroups,
+    addFolder,
+    addGroup,
+    addTask,
+    addBoard,
+    createTeamMemeber
+};
