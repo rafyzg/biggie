@@ -1,5 +1,5 @@
-const { models } = require('../../infrastructure/db');
 const handler = require('../../infrastructure/db/handler');
+const logger = require('../../infrastructure/logging/logger.js');
 
 const getFoldersJson = async(req, res) => {
     const folders = await handler.getFolders(req.teammemberId);
@@ -60,7 +60,7 @@ const getBoardsTeammembersJson = async(req, res) => {
     }
 
     res.send(resp);
-}
+};
 
 const getBoardJson = async(req, res) => {
     const isMember = await handler.isBoardTeammember(req.params.boardId, req.teammemberId);
@@ -86,6 +86,47 @@ const getBoardJson = async(req, res) => {
         }
         res.send(resp);
     }
+};
+
+const addFolder = async(req, res) => {
+    
+    try {
+        await handler.addFolder({label : req.body.label, teammemberId : req.teammemberId});
+        res.send("Added a new Folder");
+        logger.info("Added a new folder");
+    } catch(err) {
+        res.send({ error : "Error creating a new folder"});
+    }
+};
+
+const addBoard = async(req, res) => {
+    try {
+        await handler.addBoard({ teammemberId : req.teammemberId, label : req.body.label, folderId: req.body.folderId });
+        logger.info("Added a new board");
+        res.send("Added a new board");
+    } catch(err) {
+        res.send({ error : "Error createing a new board"});
+    }
+}
+
+const addGroup = async(req, res) => {
+    try {
+        await handler.addGroup({ boardId : req.body.boardId, label : req.body.label });
+        logger.info("Added a new group");
+        res.send("Addeed a new group");
+    } catch(err) {
+        res.send({error : "Error creating a new group"});
+    }
+};
+
+const addTask = async(req, res) => {
+    try {
+        await handler.addTask({ label : req.body.label, metadata : req.body.metadata, teammemberId : req.teammemberId, groupId : req.params.groupId });
+        logger.info("Added a new task");
+        res.send("Added a new task");
+    } catch(err) {
+        res.send({ Error : "Error creating a new board"})
+    }
 }
 
 module.exports = {
@@ -93,5 +134,9 @@ module.exports = {
     getTeammemberJson,
     getBoardsJson,
     getBoardsTeammembersJson,
-    getBoardJson
+    getBoardJson,
+    addFolder,
+    addBoard,
+    addGroup,
+    addTask
 };

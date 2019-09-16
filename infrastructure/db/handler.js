@@ -20,7 +20,7 @@ const getFolders = async(teammemberId) => {
 */
 const addFolder = async(request) => {
     try {
-        models.folder.create({ label : request.label, teammemberId : request.id});
+        await models.folder.create({ label : request.label, teammemberId : request.id});
     } catch(err) {
         throw Error(err);
     }
@@ -49,7 +49,7 @@ const addBoard = async(board) => {
     try {
         const board = await models.board.create({ label : request.label, folderId: request.folder});
         const member = await getTeamMember(board.teammemberId);
-        board.setTeammembers(member, {});
+        await board.setTeammembers(member, {});
     } catch(err) {
         throw Error(err);
     }
@@ -75,7 +75,7 @@ const getTeamMember = async(teammemberId) => {
 */
 const getTeammemberByEmail = async(emailAddress) => {
     try {
-        return await models.teammember.findOne({ where : { emailAddress : emailAddress}});
+        return await models.teammember.findOne({ where : { emailAddress }});
     } catch (err) {
         throw Error(err);
     }
@@ -85,9 +85,13 @@ const getTeammemberByEmail = async(emailAddress) => {
 * @param {JSON} member Details of the new members
 * @return Nothing.
 */
-const createTeamMemeber = async(member) => {
-    models.teammember.create({ emailAddress : member.emailAddress, 
-        password : member.password });
+const createTeamMember = async(member) => {
+    try {
+        await models.teammember.create({ emailAddress : member.emailAddress, 
+            password : member.password });
+    } catch(err) {
+        throw Error(err);
+    }
 
 }
 
@@ -99,7 +103,7 @@ const createTeamMemeber = async(member) => {
 const getBoardTeammembers = async(boardId) => {
     try {
         const board = await getBoard(boardId);
-        if(board != null) {
+        if(board) {
             return await board.getTeammembers();
         } else {
             return [];
@@ -115,7 +119,7 @@ const getBoardTeammembers = async(boardId) => {
 */
 const getGroups = async(boardId) => {
     try {
-        return await models.group.findAll({ where : { boardId : boardId } });
+        return await models.group.findAll({ where : { boardId }});
     } catch(err) {
         throw Error(err);
     }
@@ -132,7 +136,7 @@ const isBoardTeammember = async(boardId, teammemberId) => {
     const isMember = await sequelize.query('SELECT * FROM board_teammember WHERE "boardId" = (:boardId) AND "teammemberId" = (:teammemberId)',{
         replacements : { boardId : boardId, teammemberId : teammemberId},
         type: sequelize.QueryTypes.SELECT });
-    if(isMember.length == 0) {
+    if(!isMember.length) {
         return false;
     }
     return true;
@@ -182,9 +186,8 @@ const getBoard = async(boardId) => {
 */
 const addTask = async(task) => {
     try {
-        models.task.create({ label : task.label, status : 'unfinished', 
-            metadata : task.metadata, teammemberId : task.teammemberId,
-            groupId : task.groupId });
+        task.status = 'unfinished';
+        await models.task.create(task);
     } catch (err) {
         throw Error(err);
     }
@@ -204,5 +207,5 @@ module.exports = {
     addGroup,
     addTask,
     addBoard,
-    createTeamMemeber
+    createTeamMember
 };

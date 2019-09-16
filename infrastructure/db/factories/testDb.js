@@ -9,12 +9,12 @@ const testDatabase = async () => {
   //member.addBoard(board, {});
   //only use one of them. they do the same => add relation to the pivot table
   const group = await models.group.create({ label : 'groupFactory', boardId: board.id });
-  models.task.create({ label : 'taskFactory', status : 'unfinished',
+  await models.task.create({ label : 'taskFactory', status : 'unfinished',
     metadata : {}, groupId: group.id, teammemberId: user.id, teammeberId: member.id });
 };
 
-testTable();
+testDatabase();
 
 module.exports = {
-  testTable
+  testDatabase
 };

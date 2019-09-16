@@ -51,8 +51,16 @@ const validateToken = (req, res, next) => {
     });
 };
 
+const validateMember = (req, res, next) => {
+    if(req.path == '/login') { //No need to check token
+        return next();
+    } else {
+        validateToken(req, res, next);
+    }
+}
+
 module.exports = {
     verifyLogin,
     login,
-    validateToken
+    validateMember
 };
