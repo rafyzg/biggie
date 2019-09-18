@@ -1,38 +1,54 @@
 
-const { models, initDb } = require('../../infrastructure/db/');
+const { models } = require('../../infrastructure/db/');
+const logger = require('../../infrastructure/logging/logger');
 const config = require('./config');
 const jwt = require('jsonwebtoken');
 
+/**
+* Checks in the database if user with this email & password exists, if yes then continue to the next function
+* if no - then send 403K
+* @param {*} req express request
+* @param {*} res express response
+* @param {*} next passing to next middleware function
+*/
 const verifyLogin = async(req, res, next) => {
-
-    const user = await models.teammember.findOne({ where : {emailAddress : req.body.emailAddress} })
+    try {
+        const user = await models.teammember.findOne({ where : {emailAddress : req.body.emailAddress} });
+    } catch(err) {
+        throw Error(err);
+    }
     if(!user) {
-        res.status(404).send({error : "Invalid email address"});
+        res.status(403).send({error : "Invalid email address"});
+    }
+    let hashedPassword = req.body.password;
+    if(user.password == hashedPassword) {
+        req.body = {
+            id : user.id,
+            emailAddress : user.emailAddress
+        };
+        return next();
     }
     else {
-        let hashedPassword = req.body.password;
-        if(user.password == hashedPassword) {
-            req.body = {
-                id : user.id,
-                emailAddress : user.emailAddress
-            };
-            return next();
-        }
-        else {
-            res.status(404).send({ error : "Invalid email address or password" });
-        }
+        logger.warn('Invalid login' + req.body.emailAddress);
+        res.status(403).send({ error : "Invalid email address or password" });
     }
 };
 
-const login = (req, res) => { 
+/*
+* After user is verified, token is created and sent.
+*/
+const login = (req, res) => {
     try {
         let accessToken = jwt.sign(req.body, config.secret , {expiresIn : '24h'});
         res.status(201).send({ auth : true, token : accessToken });
     } catch(err) {
-        res.status(404).send({ error : err});
+        res.status(502).send({ error : err});
     }
 };
 
+/*
+* middleware function for checking the authentication of token
+*/
 const validateToken = (req, res, next) => {
     let token = req.headers['x-access-token'];
 
@@ -42,15 +58,17 @@ const validateToken = (req, res, next) => {
     jwt.verify(token, config.secret, (err, encoded) => {
         if(err) {
             res.status(403).send({ auth : false, error : "Failed to verify token."});
+            logger.warn('couldnt verify token ' + token);
         }
-
         req.teammemberId = encoded.id;
         req.emailAddress = encoded.id;
 
         return next();
     });
 };
-
+/*
+* Apply validateToken for all routes except \login
+*/
 const validateMember = (req, res, next) => {
     if(req.path == '/login') { //No need to check token
         return next();
