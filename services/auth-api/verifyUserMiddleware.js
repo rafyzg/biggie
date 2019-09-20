@@ -12,25 +12,28 @@ const jwt = require('jsonwebtoken');
 * @param {*} next passing to next middleware function
 */
 const verifyLogin = async(req, res, next) => {
+    let user;
     try {
-        const user = await models.teammember.findOne({ where : {emailAddress : req.body.emailAddress} });
+        user = await models.teammember.findOne({ where : {emailAddress : req.body.emailAddress} });
     } catch(err) {
         throw Error(err);
     }
     if(!user) {
         res.status(403).send({error : "Invalid email address"});
     }
-    let hashedPassword = req.body.password;
-    if(user.password == hashedPassword) {
-        req.body = {
-            id : user.id,
-            emailAddress : user.emailAddress
-        };
-        return next();
-    }
     else {
-        logger.warn('Invalid login' + req.body.emailAddress);
-        res.status(403).send({ error : "Invalid email address or password" });
+        let hashedPassword = req.body.password;
+        if(user.password == hashedPassword) {
+            req.body = {
+                id : user.id,
+                emailAddress : user.emailAddress
+            };
+            return next();
+        }
+        else {
+            logger.warn('Invalid login ${req.body.emailAddress}');
+            res.status(403).send({ error : "Invalid email address or password" });
+        }
     }
 };
 
@@ -75,7 +78,7 @@ const validateMember = (req, res, next) => {
     } else {
         validateToken(req, res, next);
     }
-}
+};
 
 module.exports = {
     verifyLogin,

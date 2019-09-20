@@ -1,5 +1,5 @@
 const express = require('express');
-const { folder, board, group, task, teammember } = require('./models');
+const { folder, board, group, task, teammember } = require('./handlers');
 const { initDb } = require('../../infrastructure/db/');
 const auth = require('../auth-api/verifyUserMiddleware');
 const app = express();
