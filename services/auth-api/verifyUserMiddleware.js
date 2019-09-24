@@ -1,6 +1,6 @@
 
 const { models } = require('../../infrastructure/db/');
-const logger = require('../../infrastructure/logging/logger');
+const { logger } = require('../../infrastructure/logging/logger');
 const config = require('./config');
 const jwt = require('jsonwebtoken');
 
@@ -31,7 +31,7 @@ const verifyLogin = async(req, res, next) => {
             return next();
         }
         else {
-            logger.warn('Invalid login ${req.body.emailAddress}');
+            logger.log('error',`Invalid login ${req.body.emailAddress}`);
             res.status(403).send({ error : "Invalid email address or password" });
         }
     }
@@ -45,6 +45,7 @@ const login = (req, res) => {
         let accessToken = jwt.sign(req.body, config.secret , {expiresIn : '24h'});
         res.status(201).send({ auth : true, token : accessToken });
     } catch(err) {
+        logger.log('error',`Login error ${err}`);
         res.status(502).send({ error : err});
     }
 };
@@ -61,7 +62,7 @@ const validateToken = (req, res, next) => {
     jwt.verify(token, config.secret, (err, encoded) => {
         if(err) {
             res.status(403).send({ auth : false, error : "Failed to verify token."});
-            logger.warn('couldnt verify token ' + token);
+            logger.log('warn','couldnt verify token ' + token);
         }
         req.teammemberId = encoded.id;
         req.emailAddress = encoded.id;
@@ -73,7 +74,7 @@ const validateToken = (req, res, next) => {
 * Apply validateToken for all routes except \login
 */
 const validateMember = (req, res, next) => {
-    if(req.path == '/login') { //No need to check token
+    if(req.path === '/login') { //No need to check token
         return next();
     } else {
         validateToken(req, res, next);

@@ -10,10 +10,10 @@ const getFolders = async(req, res) => {
         const folders = await models.folder.findAll({ where : { teammemberId : req.teammemberId} });
         res.send(folders);
     } catch(err) {
+        logger.log('error',`Errror getting teammember folders ${req.teammemberId} ${err}`);
         throw Error(err);
     }
 };
-
 /**
 * Creates a new folder for the logges teammember
 */
@@ -23,6 +23,7 @@ const addFolder = async(req, res, next) => {
         req.folderId = folder.id;
         res.send("Successfully created a new folder");
     } catch(err) {
+        logger.log('error',`Errror adding folder ${err}`);
         throw Error(err);
     }
 };
