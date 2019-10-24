@@ -1,7 +1,8 @@
 
 const { models } = require('../../infrastructure/db/');
-const config = require('./config');
+const { logger } = require('../../infrastructure/logging/logger');
 const jwt = require('jsonwebtoken');
+const config = require('./config');
 
 /**
 * Checks in the database if user with this email & password exists, if yes then continue to the next function
@@ -43,8 +44,9 @@ const verifyLogin = async(req, res, next) => {
 const login = (req, res) => {
     let accessToken;
     try {
-        accessToken = jwt.sign(req.body, config.secret , {expiresIn : '24h'});
+        accessToken = jwt.sign(req.body, config.secret , { expiresIn : '24h' });
         res.status(201).send({ auth : true, token : accessToken });
+        //Add redirect
     } catch(err) {
         logger.log('error',`Login error ${err}`);
         res.status(502).send({ error : err});
