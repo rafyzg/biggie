@@ -21,9 +21,9 @@ const logger = winston.createLogger({
     format : biggieLogFormat,
     defaultMeta: { service: 'user-service' },
     transports: [
-        new winston.transports.File({ filename: '../../infrastructure/logging/emergency.log', level: 'emerg' }),
-        new winston.transports.File({ filename: '../../infrastructure/logging/error.log', level: 'error' }),
-        new winston.transports.File({ filename: '../../infrastructure/logging/combinedlogs.log' })
+        new winston.transports.File({ filename: '../logs/emergency.log', level: 'emerg' }),
+        new winston.transports.File({ filename: '../logs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: '../logs/combinedlogs.log' })
     ]
 });
 
