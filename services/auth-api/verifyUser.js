@@ -1,5 +1,4 @@
-
-const { models } = require('../../infrastructure/db/');
+const { models } = require('../../infrastructure/db');
 const { logger } = require('../../infrastructure/logging/logger');
 const jwt = require('jsonwebtoken');
 const config = require('./config');
@@ -11,7 +10,7 @@ const config = require('./config');
 * @param {*} res express response
 * @param {*} next passing to next middleware function
 */
-const verifyLogin = async(req, res, next) => {
+const verifyLoginMiddleware = async(req, res, next) => {
     let user;
     try {
         user = await models.teammember.findOne({ where : { emailAddress: req.body.emailAddress} });
@@ -31,10 +30,8 @@ const verifyLogin = async(req, res, next) => {
             };
             return next();
         }
-        else {
-            logger.log('error',`Invalid login ${req.body.emailAddress}`);
-            res.status(403).json({ error : "Invalid email address or password" });
-        }
+        logger.log('error',`Invalid login ${req.body.emailAddress}`);
+        res.status(403).json({ error : "Invalid email address or password" });
     }
 };
 
@@ -54,6 +51,6 @@ const login = (req, res) => {
 };
 
 module.exports = {
-    verifyLogin,
+    verifyLoginMiddleware,
     login
 };
