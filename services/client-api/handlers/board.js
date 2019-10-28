@@ -45,7 +45,7 @@ const addBoard = async(req, res) => {
     try {
         board = await models.board.create({ label : req.body.label, folderId });
     } catch(err) {
-        logger.log('error',`Errror adding new board ${err}`);
+        logger.log('error',`Error adding new board ${err}`);
         res.status(500).json({ error : `Error creating new board ${err}`});
     }
 
@@ -60,15 +60,14 @@ const addBoard = async(req, res) => {
         logger.log('error',`Error finding logged user id. ${err}`);
         res.status(500).json({ error : `Error finding logged teammember` });
     }
-
     //If member wasn't found
     if(!member) {
         res.status(500).json({ error : `Error adding new board and finding teammember`});
     }
-
+    let newBoard;
     try { //Try attaching the new created board with the logged in user
-        await req.board.setTeammembers(member, {});
-        res.status(201).json({ message : "Added a new Board" });
+        newBoard = await board.setTeammembers(member, {});
+        res.status(201).send(newBoard);
     } catch(err) {
         logger.log('error',`Errror adding teammember to board ${err}`);
         res.status(500).json({ error : `Error adding new board and finding teammember` });
@@ -89,8 +88,8 @@ const addBoardTeammember = async(req, res) => {
     }
 
     try {
-        await req.board.setTeammembers(member, {});
-        res.status(201).send({message : "Added a new Board"});
+        let newBoard = await req.board.setTeammembers(member, {});
+        res.status(201).json({newBoard});
     } catch(err) {
         logger.log('error',`Errror adding teammember to board ${err}`);
         res.status(500).json({ error : `Error adding new teammember to created board` });

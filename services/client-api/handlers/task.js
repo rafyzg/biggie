@@ -6,17 +6,17 @@ const logger = require('../../../infrastructure/logging/logger');
 * @param {*} res express response
 */
 const addTask = async(req, res) => {
-    let task;
+    let task, newTask;
     try {
         task = {
-            label : req.label,
-            status : 'unfinished',
-            metadata : req.metadata,
-            groupId : req.groupId,
+            label : req.body.label,
+            status : req.body.status || 'unfinished',
+            metadata : req.body.metadata,
+            groupId : req.body.groupId,
             teammemberId : req.teammemberId
         };
-        let createdTask = await models.task.create(task);
-        res.status(201).json({ "data" : `${createdTask}` });
+        let newTask = await models.task.create(task);
+        res.status(201).send(newTask);
     } catch(err) {
         logger.log('error',`Error adding task - ${req.teammemberId} - ${err}`);
         res.status(500).json({ 'error' : 'Error adding task'});

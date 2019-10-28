@@ -1,5 +1,7 @@
 const { models } = require('../../../infrastructure/db');
 const logger = require('../../../infrastructure/logging/logger');
+const { body } = require('express-validator');
+
 /**
 * Gets the boardId of the group
 * @param {*} req express request
@@ -18,6 +20,14 @@ const getGroupBoardId = async(req, res, next) => {
     }
 };
 
+const groupRules = [
+    //Label must exist
+    body('label').exists().withMessage("Must specify group label"),
+    //Board id must exist and be a number
+    body('boardId').exists().isNumeric().withMessage('Must specify boardId of the group')
+];
+
 module.exports = {
-    getGroupBoardId
+    getGroupBoardId,
+    groupRules
 };

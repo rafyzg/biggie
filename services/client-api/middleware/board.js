@@ -1,5 +1,6 @@
 const { getSequelize } = require('../../../infrastructure/db');
 const { logger } = require('../../../infrastructure/logging/logger');
+const { body, validationResult } = require('express-validator');
 
 /*
 * Checks with a given boardId and given teammemberId if the user is a member in this board
@@ -27,6 +28,34 @@ const isBoardMember = async(req, res, next) => {
     }
 };
 
+/*
+* Set post request validation rules
+*/
+const boardRules = [
+        //Label must exist
+        body('label').exists().withMessage("Must specify board label"),
+        //Folder id must be a number
+        body('folderId').optional().isNumeric()
+];
+
+/*
+* Checks the post request meets the requirements
+*/
+const validateRequest = (req, res, next) => {
+    const errors = validationResult(req);
+    if(errors.isEmpty()) {
+        return next();
+    }
+    const extractedErrors = [];
+    errors.array().map(err => extractedErrors.push({ [err.param] : err.msg }));
+
+    return res.status(422).json({
+        errors : extractedErrors
+    });
+};
+
 module.exports = {
-    isBoardMember
+    isBoardMember,
+    boardRules,
+    validateRequest
 };

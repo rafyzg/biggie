@@ -9,8 +9,9 @@ const logger = require('../../../infrastructure/logging/logger');
 const addGroup = async(req, res) => {
     let group;
     try {
+        //Creating the new group
         group = await models.group.create({ label : req.body.label, boardId : req.body.boardId });
-        res.status(201).json({"data" : `${group}`});
+        res.status(201).send(group);
     } catch(err) {
         logger.log('error',`Errror adding group - ${req.teammemberId} - ${err}`)
         res.status(500).json({ 'error' : 'Error adding group'});
@@ -22,6 +23,7 @@ const addGroup = async(req, res) => {
 const getGroup = async(req, res) => {
     let group;
     try {
+        //Fetch the requested group
         group = await models.group.findByPk(req.params.groupId);
         res.json(group);
     } catch(err) {
