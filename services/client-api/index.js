@@ -1,7 +1,7 @@
 const express = require('express');
 const { initDb } = require('../../infrastructure/db/');
 const router = require('./router');
-const auth = require('./validator');
+const auth = require('./middleware/tokenValidator');
 const app = express();
 const port = 5867;
 
