@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "db:migrate": "cd infrastructure/db && npx sequelize-cli db:migrate",
-    "db:seed": "npx sequelize-cli db:seed:all",
+    "db:seed": "cd infrastructure/db && npx sequelize-cli db:seed:all",
     "build" : "npm run db:migrate && npm run db:seed",
     "test": "mocha tests"
   },
