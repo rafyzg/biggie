@@ -31,15 +31,6 @@ const addFolder = async(req, res) => {
         res.status(500).json({ 'error' : `cant' add folder`})
     }
 };
-/**
-* Adds requested board to folder
-*/
-const addBoardtoFolder = async(req, res) => {
-    if(!req.boards) {
-        res.send("Successfully created a new folder");
-    }
-
-};
 
 module.exports = {
     getFolders,

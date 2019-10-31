@@ -1,16 +1,26 @@
 {
   "development": {
-    "username": "postgres",
+    "username": "admin",
     "password": 12345,
     "database": "monday",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false
   },
   "test": {
-    "username": "postgres",
+    "username": "admin",
     "password": 12345,
     "database": "monday",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "admin",
+    "password": 12345,
+    "database": "monday",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
   }
 }

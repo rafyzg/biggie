@@ -4,8 +4,10 @@
   "description": "Open source node.js project managemant tool",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "db:migrate": "cd infrastructure/db && npx sequelize-cli db:migrate"
+    "db:migrate": "cd infrastructure/db && npx sequelize-cli db:migrate",
+    "db:seed": "cd infrastructure/db && npx sequelize-cli db:seed:all",
+    "build" : "npm run db:migrate && npm run db:seed",
+    "test": "mocha tests"
   },
   "repository": {
     "type": "git",
@@ -20,10 +22,17 @@
   "dependencies": {
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "express-validator": "^6.2.0",
     "faker": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
+    "knex": "^0.20.0",
+    "mocha": "^6.2.2",
     "pg": "^7.11.0",
     "sequelize": "^5.8.6",
-    "sequelize-cli": "^5.5.1"
+    "sequelize-cli": "^5.5.1",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0"
   }
 }

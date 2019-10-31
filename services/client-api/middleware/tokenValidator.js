@@ -1,6 +1,5 @@
-const { models } = require('../../infrastructure/db/');
-const { logger } = require('../../infrastructure/logging/logger');
-const config = require('../auth-api/config');
+const { logger } = require('../../../infrastructure/logging/logger');
+const config = require('../../auth-api/config');
 const jwt = require('jsonwebtoken');
 
 /*

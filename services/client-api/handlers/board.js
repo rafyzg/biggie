@@ -1,5 +1,4 @@
 const { models } = require('../../../infrastructure/db');
-const { getSequelize } = require('../../../infrastructure/db');
 const { logger }= require('../../../infrastructure/logging/logger');
 
 /**
@@ -19,34 +18,9 @@ const getBoards = async(req, res) => {
         res.status(500).json({ error : " Error getting boards"});
     }
 };
-/*
-* Checks with a given boardId and given teammemberId if the user is a member in this board
-*/
-const isBoardMember = async(req, res, next) => {
-    let sequelize;
-    try {
-        sequelize = await getSequelize();
-    } catch(err) {
-        logger.log('error',`Cant get sequalize ${err}`);
-        process.exit(1); //Fatal :: can't get sequalize
-    }
-    let isMember;
-    try {
-        isMember = await sequelize.query('SELECT * FROM board_teammember WHERE "boardId" = (:boardId) AND "teammemberId" = (:teammemberId)',{
-            replacements : { boardId : req.params.boardId, teammemberId : req.teammemberId},
-            type: sequelize.QueryTypes.SELECT });
-        if(!isMember.length) {
-            res.staus(401).json({ error : "Didn't find this board"});
-        }
-        return next();
-    } catch(err) {
-        logger.log('error',`error reaching the board  - ${req.params.boardId} - ${err}`);
-        res.status(500).json({"error" : "Error reaching this board"});
-    }
-};
 /**
- * Find all data about request board - including groups and tasks inside board
- */
+* Find all data about request board - including groups and tasks inside board
+*/
 const getBoard = async(req, res) => {
     let board;
     try {
@@ -71,7 +45,7 @@ const addBoard = async(req, res) => {
     try {
         board = await models.board.create({ label : req.body.label, folderId });
     } catch(err) {
-        logger.log('error',`Errror adding new board ${err}`);
+        logger.log('error',`Error adding new board ${err}`);
         res.status(500).json({ error : `Error creating new board ${err}`});
     }
 
@@ -86,15 +60,14 @@ const addBoard = async(req, res) => {
         logger.log('error',`Error finding logged user id. ${err}`);
         res.status(500).json({ error : `Error finding logged teammember` });
     }
-
     //If member wasn't found
     if(!member) {
         res.status(500).json({ error : `Error adding new board and finding teammember`});
     }
-
+    let newBoard;
     try { //Try attaching the new created board with the logged in user
-        await req.board.setTeammembers(member, {});
-        res.status(201).json({ message : "Added a new Board" });
+        newBoard = await board.setTeammembers(member, {});
+        res.status(201).send(newBoard);
     } catch(err) {
         logger.log('error',`Errror adding teammember to board ${err}`);
         res.status(500).json({ error : `Error adding new board and finding teammember` });
@@ -115,8 +88,8 @@ const addBoardTeammember = async(req, res) => {
     }
 
     try {
-        await req.board.setTeammembers(member, {});
-        res.status(201).send({message : "Added a new Board"});
+        let newBoard = await req.board.setTeammembers(member, {});
+        res.status(201).json({newBoard});
     } catch(err) {
         logger.log('error',`Errror adding teammember to board ${err}`);
         res.status(500).json({ error : `Error adding new teammember to created board` });
@@ -144,7 +117,6 @@ const getBoardTeammembers = async(req, res) => {
 module.exports = {
     getBoards,
     addBoard,
-    isBoardMember,
     getBoard,
     addBoard,
     addBoardTeammember,
