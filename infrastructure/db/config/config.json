@@ -19,7 +19,7 @@
     "username": "admin",
     "password": 12345,
     "database": "monday",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   }
