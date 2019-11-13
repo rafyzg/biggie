@@ -7,7 +7,7 @@ before_script:
 - psql -c 'create database monday;' -U postgres
 - psql -c "CREATE USER admin WITH PASSWORD '12345';" -U postgres
 script:
-- npm run build
+- npm run setup:db
 - npm test
 env:
   global:
