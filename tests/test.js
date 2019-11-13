@@ -1,8 +1,9 @@
 let chai = require('chai');
 let assert = require('assert');
+const connection = process.env.DATABASE_URL || 'postgres://admin:12345@localhost:5432/monday';
 let knex = require('knex')({
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection,
     pool: { min: 0, max: 200 }
 });
 
