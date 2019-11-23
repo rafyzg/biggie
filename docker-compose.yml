@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:12-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: monday
+    volumes:
+      - ./pgData:/var/lib/postgresql/data
+  auth:
+    build: .
+    command: npm run start:auth
+    ports:
+      - 5868:5868
+    depends_on:
+      - db
+    links:
+      - db
+  client:
+    build: .
+    command: npm run start:client
+    ports:
+      - 5867:5867
+    depends_on:
+      - db
+    links:
+      - db
+  migration:
+    build: .
+    command: ["wait-for-it/wait-for-it.sh", "db:5432", "--", "npm", "run", "setup:db"]
+    depends_on:
+      - db
+    links:
+      - db
