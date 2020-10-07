@@ -1,2 +1,2 @@
 # biggie
-Open source node.js project managemant tool
+Open source project managemant tool written in Node.JS
